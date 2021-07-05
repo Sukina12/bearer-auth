@@ -12,7 +12,7 @@
 
 [test Report](https://github.com/Sukina12/bearer-auth/actions)
 
-[deployment]()
+[deployment](https://sukina-bearer-auth.herokuapp.com/)
 
 [pull request](https://github.com/Sukina12/bearer-auth/pull/1)
 

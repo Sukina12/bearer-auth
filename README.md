@@ -10,11 +10,11 @@
 8. fill the variables of .env
 9. run the app
 
-[test Report]()
+[test Report](https://github.com/Sukina12/bearer-auth/actions)
 
 [deployment]()
 
-[pull request]()
+[pull request](https://github.com/Sukina12/bearer-auth/pull/1)
 
 ![testSignIn](test.signin.png)
 

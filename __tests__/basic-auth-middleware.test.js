@@ -4,6 +4,7 @@ require('@code-fellows/supergoose');
 const middleware = require('../src/auth/middleware/basicAuth');
 const Users = require('../src/auth/models/userModel');
 
+
 let users = {
   admin: { username: 'admin', password: 'password' },
 };
@@ -44,19 +45,19 @@ describe('Auth Middleware', () => {
 
     }); // it()
 
-    // it('logs in an admin user with the right credentials', () => {
+    it('logs in an admin user with the right credentials', async () => {
+      const user0 = await new Users(users.admin).save();
+      // Change the request to match this test case
+      req.headers = {
+        authorization: 'Basic YWRtaW46cGFzc3dvcmQ=',
+      };
 
-    //   // Change the request to match this test case
-    //   req.headers = {
-    //     authorization: 'Basic YWRtaW46cGFzc3dvcmQ=',
-    //   };
+      return middleware(req, res, next)
+        .then(() => {
+          expect(next).toHaveBeenCalledWith();
+        });
 
-    //   return middleware(req, res, next)
-    //     .then(() => {
-    //       expect(next).toHaveBeenCalledWith();
-    //     });
-
-    // }); // it()
+    }); // it()
 
   });
 

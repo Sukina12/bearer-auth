@@ -11,11 +11,12 @@ let users = {
   admin: { username: 'admin', password: 'password' },
 };
 
-// // Pre-load our database with fake users
+// Pre-load our database with fake users
 // beforeAll(async (done) => {
 //   await new Users(users.admin).save();
 //   done();
 // });
+
 
 describe('Auth Middleware', () => {
 
@@ -43,21 +44,22 @@ describe('Auth Middleware', () => {
 
     });
 
-    // it('logs in a user with a proper token', () => {
+    it('logs in a user with a proper token', async () => {
 
-    //   const user = { username: 'admin' };
-    //   const token = jwt.sign(user, process.env.SECRET);
+      const user = { username: 'admin' };
+      const token = jwt.sign(user, process.env.SECRET);
+      const user0 = await new Users(users.admin).save();
+      console.log(user0);
+      req.headers = {
+        authorization: `Bearer ${token}`,
+      };
 
-    //   req.headers = {
-    //     authorization: `Bearer ${token}`,
-    //   };
+      return middleware(req, res, next)
+        .then(() => {
+          expect(next).toHaveBeenCalledWith();
+        });
 
-    //   return middleware(req, res, next)
-    //     .then(() => {
-    //       expect(next).toHaveBeenCalledWith();
-    //     });
-
-    // });
+    });
 
   });
 

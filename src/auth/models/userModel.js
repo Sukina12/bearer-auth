@@ -4,51 +4,47 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const secret = process.env.SECRET || 'super-secret-token';
+const secret = process.env.SECRET;
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true},
+const users = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
 });
 
-userSchema.virtual('token').get(function () {
-  let tokenObj = {
+// Adds a virtual field to the schema. We can see it, but it never persists
+// So, on every user object ... this.token is now readable!
+users.virtual('token').get(function () {
+  let tokenObject = {
     username: this.username,
   };
-  return jwt.sign(tokenObj,secret);
+  return jwt.sign(tokenObject, secret);
 });
 
-userSchema.pre('save', async function () {
+users.pre('save', async function () {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
 });
-userSchema.statics.authenticateBasic = async function (username, password) {
 
+// BASIC AUTH
+users.statics.authenticateBasic = async function (username, password) {
   const user = await this.findOne({ username });
-  const isValid = await bcrypt.compare(password, user.password);
-  if (isValid) {
-    return user;
-  } else {
-    throw new Error('Invalid User !');
-  }
-
+  const valid = await bcrypt.compare(password, user.password);
+  if (valid) { return user; }
+  throw new Error('Invalid User');
 };
-userSchema.statics.authenticateWithToken = async function (token) {
+
+// BEARER AUTH
+users.statics.authenticateWithToken = async function (token) {
   try {
-    const payload = jwt.verify(token, secret);
-    const user = await this.findOne({
-      username: payload.username,
-    });
-    if (user) {
-      return user;
-    } else {
-      throw new Error('Invalid Token Username');
-    }
-  } catch (error) {
-    throw new Error(error.message);
+    const parsedToken = jwt.verify(token, secret);
+    const user = this.findOne({ username: parsedToken.username });
+    if (user) { return user; }
+    throw new Error('User Not Found');
+  } catch (e) {
+    throw new Error(e.message);
   }
 };
 
-const User = mongoose.model('users', userSchema);
-module.exports = User;
+
+module.exports = mongoose.model('users', users);
